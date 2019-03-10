@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart', 'line']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      const voteData = new Array();
+      const url = '__YOUR_WEBSITE_DOMAIN__/favo.txt'
+
+      function graphData() {
+        fetch(url)
+          .then(function (response) {
+            return response.text();
+          })
+          .then(function(text) {
+            // voteData is favo.txt
+            for (const e of text.split('\n')) {
+              if (e.split('\t').length != 1) {
+                // time を取り除くための slice()
+                voteData.push(e.split('\t').slice(1));
+              }
+            };
+          });
+      }
+
+      graphData()
+
+      function drawChart(){
+        var data = new google.visualization.DataTable();
+
+        for (const e of voteData[0]) {
+          // unixtime が横軸
+          data.addColumn('number', e);
+        }
+
+        // header を取り除くための slice()
+        for (const p of voteData.slice(1)) {
+          // 数値は文字列なので型変換
+          data.addRow(p.map( str => parseInt(str, 10) ));
+        }
+
+        var options = {
+        chart: {
+          title: '15周年 FAVORITE ヒロイン総選挙 投票数推移',
+          subtitle: '取得期間: 03/09 10:00 -'
+        },
+        width: 1000,
+        height: 1000
+      };
+
+      var chart = new google.charts.Line(document.getElementById('chart'));
+      chart.draw(data, google.charts.Line.convertOptions(options));
+    }
+
+
+    </script>
+  </head>
+
+  <body>
+    <div id="chart"></div>
+    <a href="http://www.favo.co.jp/cgi/15th_vote/15th_vote.cgi">
+      http://www.favo.co.jp/cgi/15th_vote/15th_vote.cgi
+    </a>
+  </body>
+</html>
