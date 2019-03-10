@@ -7,7 +7,7 @@
       google.charts.setOnLoadCallback(drawChart);
 
       const voteData = new Array();
-      const url = '__YOUR_WEBSITE_DOMAIN__/favo.txt'
+      const url = '__YOUR_WEBSITE_DOMAIN__/favo.txt';
 
       function graphData() {
         fetch(url)
@@ -25,20 +25,23 @@
           });
       }
 
-      graphData()
+      graphData();
 
       function drawChart(){
         var data = new google.visualization.DataTable();
+        // 日付表記での時間を追加
+        data.addColumn('datetime', 'Date');
 
-        for (const e of voteData[0]) {
-          // unixtime が横軸
+        // 時間軸はさっき追加したのでキャラ名のみ追加
+        for (const e of voteData[0].slice(1)) {
           data.addColumn('number', e);
         }
 
         // header を取り除くための slice()
         for (const p of voteData.slice(1)) {
+          // 先頭は時間なので concat() で無理やりくっつける
           // 数値は文字列なので型変換
-          data.addRow(p.map( str => parseInt(str, 10) ));
+          data.addRow([new Date(p[0] * 1000)].concat(p.slice(1).map( str => parseInt(str, 10) )));
         }
 
         var options = {
@@ -54,7 +57,6 @@
       chart.draw(data, google.charts.Line.convertOptions(options));
     }
 
-
     </script>
   </head>
 
@@ -62,6 +64,9 @@
     <div id="chart"></div>
     <a href="http://www.favo.co.jp/cgi/15th_vote/15th_vote.cgi">
       http://www.favo.co.jp/cgi/15th_vote/15th_vote.cgi
+    </a> /
+    <a href="https://github.com/owatan/favo-15th-vote-ranking">
+      Github (owatan/favo-15th-vote-ranking)
     </a>
   </body>
 </html>
